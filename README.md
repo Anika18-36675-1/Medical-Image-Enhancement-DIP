@@ -44,16 +44,17 @@ This project demonstrates how simple, transparent methods can significantly impr
 Medical-Image-Enhancement-DIP/
 │
 ├── data/
-│ └── sample_image.png # Original chest X-ray
+│   └── sample_image.png
 │
 ├── results/
-│ ├── equalized.png # Histogram Equalization output
-│ └── clahe.png # CLAHE output (local enhancement)
+│   ├── equalized.png
+│   └── clahe.png
 │
 ├── src/
-│ └── main.py # Enhancement pipeline source code
+│   └── main.py
 │
-└── README.md # Project documentation
+└── README.md
+
 
 This folder structure reflects open, reproducible research practices—clean separation of data, code, and results.
 
