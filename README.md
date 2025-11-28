@@ -41,7 +41,7 @@ This project demonstrates how simple, transparent methods can significantly impr
 
 2. Repository Structure:
    
-### 📁 Repository Structure
+### Repository Structure
 
 - **Medical-Image-Enhancement-DIP/**
   - **data/**
@@ -182,13 +182,20 @@ The script will generate:
 results/equalized.png
 results/clahe.png
 
-8. Limitations (Current Version):
-*Only single-image processing
-*No quantitative metrics (PSNR, SSIM, entropy)
-*No noise filtering
-*No multi-image processing pipeline
-*Parameters are not optimized yet
-*These limitations will be addressed in the full final project.
+8. Limitations (Current Version)
+Only supports single-image processing
+
+No quantitative evaluation metrics (PSNR, SSIM, Entropy)
+
+No noise filtering (Median, Gaussian, Bilateral, etc.)
+
+No batch / multi-image processing pipeline
+
+Enhancement parameters are not optimized
+
+Visualization of intermediate steps is not included
+
+Results rely solely on contrast enhancement (no advanced enhancement yet)
 
 9. Future Work:
 *Add Median and Gaussian filtering
