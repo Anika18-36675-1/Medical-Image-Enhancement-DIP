@@ -41,19 +41,21 @@ This project demonstrates how simple, transparent methods can significantly impr
 
 2. Repository Structure:
    
-Medical-Image-Enhancement-DIP/
+### 📂 Repository Structure
+
+📁 **Medical-Image-Enhancement-DIP**
 │
-├── data/
-│   └── sample_image.png
+├── 📂 **data**
+│     └── 📄 sample_image.png  
 │
-├── results/
-│   ├── equalized.png
-│   └── clahe.png
+├── 📂 **results**
+│     ├── 📄 equalized.png  
+│     └── 📄 clahe.png  
 │
-├── src/
-│   └── main.py
+├── 📂 **src**
+│     └── 📄 main.py  
 │
-└── README.md
+└── 📄 **README.md**
 
 
 This folder structure reflects open, reproducible research practices—clean separation of data, code, and results.
