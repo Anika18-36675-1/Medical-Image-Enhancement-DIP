@@ -5,7 +5,7 @@ The goal is to demonstrate open-science practices, reproducible workflows, and c
 
 ---
 
-## 📌 1. Project Overview
+##  1. Project Overview
 Medical images such as X-rays often have low contrast or uneven brightness, making subtle anatomical details difficult to see.  
 This project enhances a chest X-ray using two classical digital image processing techniques:
 
@@ -18,14 +18,14 @@ This is an **in-progress version** of the project—final methods will be added 
 
 ---
 
-## 📁 2. Repository Structure
+##  2. Repository Structure
 
 
 This structure follows open-science guidelines: separation of code, input data, and generated results.
 
 ---
 
-## 🧠 3. Methods Used
+##  3. Methods Used
 
 ### 🔹 3.1 Histogram Equalization (Global)
 - Spreads intensity values across the full range  
@@ -41,11 +41,10 @@ This structure follows open-science guidelines: separation of code, input data, 
 
 ---
 
-## 🧩 4. Code Explanation (`src/main.py`)
+##  4. Code Explanation (`src/main.py`)
 
 The script performs four major steps:
 
-```python
 import cv2
 import numpy as np
 image = cv2.imread("data/sample_image.png", 0)
@@ -54,7 +53,7 @@ clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 clahe_output = clahe.apply(image)
 cv2.imwrite("results/equalized.png", equalized)
 cv2.imwrite("results/clahe.png", clahe_output)
-🖼️ 5. Visual Results
+5. Visual Results
 🔸 Input Image
 
 data/sample_image.png
@@ -72,11 +71,11 @@ Observation:
 Histogram Equalization improves global contrast but can appear harsh.
 
 CLAHE produces more balanced and clinically useful enhancement by focusing on local image regions.
-📊 6. Comparison
+ 6. Comparison
 Method	Type	Strengths	Weaknesses
 Histogram Equalization	Global	Fast, boosts overall contrast	Over-enhancement risk
 CLAHE	Local	Preserves subtle details, prevents noise	Slower, requires parameter tuning
-▶️ 7. How to Run the Code
+7. How to Run the Code
 Install required libraries:
 py -3.13 -m pip install opencv-python numpy
 Run the enhancement script:
@@ -84,7 +83,7 @@ py -3.13 src/main.py
 
 
 Outputs will appear in the results/ folder.
-🚀 8. Future Work (For Final Project)
+8. Future Work (For Final Project)
 
 Add noise-reduction filters (Gaussian, Median)
 
