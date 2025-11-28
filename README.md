@@ -1,98 +1,199 @@
-# Medical Image Enhancement Using Histogram Equalization and CLAHE
-This repository contains the code, sample data, and results for a Digital Image Processing (DIP) project focused on improving the visual quality of medical images—specifically a chest X-ray—using classical enhancement techniques.
+# Medical Image Enhancement Using Classical Histogram-Based Techniques
 
-The goal is to demonstrate open-science practices, reproducible workflows, and clear documentation for **Assignment 2**.
+This repository contains a reproducible, open-science implementation of a medical image enhancement pipeline using classical Digital Image Processing (DIP) techniques.  
+The current version implements two commonly used contrast-enhancement methods:
 
----
+- **Histogram Equalization**  
+- **CLAHE (Contrast Limited Adaptive Histogram Equalization)**
 
-##  1. Project Overview
-Medical images such as X-rays often have low contrast or uneven brightness, making subtle anatomical details difficult to see.  
-This project enhances a chest X-ray using two classical digital image processing techniques:
+Although simple, these methods are widely used as preprocessing steps in medical imaging pipelines because they improve visibility of important anatomical details.
 
-- **Histogram Equalization** – global contrast enhancement  
-- **CLAHE (Contrast Limited Adaptive Histogram Equalization)** – localized contrast enhancement  
-
-Both methods aim to improve visibility of lung structures, ribs, and soft tissue.
-
-This is an **in-progress version** of the project—final methods will be added later in the course.
+This documentation follows the structure and style of the example GitHub project shared by the instructor, providing a clear, transparent explanation of every step and command used.
 
 ---
 
-##  2. Repository Structure
+1. Project Motivation
 
+Medical images such as X-rays often suffer from:
 
-This structure follows open-science guidelines: separation of code, input data, and generated results.
+- Poor global contrast  
+- Uneven illumination  
+- Low visibility of subtle anatomical structures  
+- Difficulties in distinguishing tissues, ribs, and abnormalities  
+
+Enhancement techniques can improve interpretation by radiologists and can serve as preprocessing for downstream tasks such as:
+
+- Segmentation  
+- Classification  
+- Image registration  
+- Feature extraction  
+
+While modern deep learning methods exist, **classical enhancement is still important** due to:
+
+- Low computational requirements  
+- Full interpretability  
+- Robustness  
+- Ability to improve visibility before applying advanced algorithms  
+
+This project demonstrates how simple, transparent methods can significantly improve X-ray images.
 
 ---
 
-##  3. Methods Used
+2. Repository Structure
+Medical-Image-Enhancement-DIP/
+│
+├── data/
+│ └── sample_image.png # Original chest X-ray
+│
+├── results/
+│ ├── equalized.png # Global histogram equalization output
+│ └── clahe.png # Local enhancement (CLAHE) output
+│
+├── src/
+│ └── main.py # Enhancement pipeline source code
+│
+└── README.md # Documentation
 
-### 🔹 3.1 Histogram Equalization (Global)
-- Spreads intensity values across the full range  
-- Improves overall brightness and contrast  
-- Useful for quickly enhancing low-contrast images  
-- **Limitation:** may cause over-brightening or unnatural appearance
-
-### 🔹 3.2 CLAHE (Local Adaptive Enhancement)
-- Applies contrast enhancement in small tiles  
-- Prevents over-amplification of noise (contrast-limiting step)  
-- Better preserves local details in medical images  
-- **More suitable for X-rays** because it balances detail and brightness
+This folder structure reflects open, reproducible research practices—clean separation of data, code, and results.
 
 ---
 
-##  4. Code Explanation (`src/main.py`)
+3. Enhancement Methods
 
-The script performs four major steps:
+## 3.1 Histogram Equalization (Global Enhancement)
 
+Histogram Equalization adjusts pixel intensities so that they spread across the entire available range.  
+This produces:
+
+- Stronger global contrast  
+- Better visibility of bones and lung boundaries  
+- Brighter overall appearance  
+
+**Limitation:**  
+It may over-enhance bright regions and does not account for local differences in illumination.
+
+---
+
+3.2 CLAHE (Local Adaptive Enhancement)
+
+CLAHE divides the image into tiles (e.g., 8×8), applies histogram equalization to each tile, and then blends them smoothly.  
+It also limits contrast amplification to prevent noise from exploding.
+
+**Benefits for medical images:**
+
+- Enhances local soft-tissue contrast  
+- Preserves subtle structural details  
+- Avoids harsh brightness jumps  
+- Handles uneven illumination well  
+
+This makes CLAHE more clinically suitable for X-rays than global histogram equalization.
+
+---
+
+4. Code Explanation (Line-by-Line Breakdown)
+
+Below is the **full explanation of each command used in `main.py`**, written in the style of your professor’s example repo.
+
+✔ Importing Required Libraries
+python
 import cv2
 import numpy as np
+
+cv2 is OpenCV, the core image-processing library.
+numpy handles arrays and pixel-level operations.
+
+Loading the Input Image:
 image = cv2.imread("data/sample_image.png", 0)
+
+*Loads the X-ray from the data/ folder.
+*The 0 flag ensures grayscale mode (correct for X-ray analysis).
+*The image is loaded as a NumPy array.
+
+Why grayscale?
+Medical X-rays are single-channel intensity images.
+Histogram-based enhancement works directly on grayscale matrices.
+
+✔ Applying Global Histogram Equalization
 equalized = cv2.equalizeHist(image)
+
+*This performs a global redistribution of pixel intensities.
+*Improves visibility of high-density structures
+*Makes the entire image brighter
+*Enhances overall contrast
+
+Equivalent conceptual command:
+Enhanced_Image = HistogramEqualize(Input_Image)
+
+✔ Applying CLAHE (Local Adaptive Enhancement)
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 clahe_output = clahe.apply(image)
+This command:
+*Creates a CLAHE processor with chosen parameters:
+*clipLimit = 2.0 prevents noise from over-amplifying
+*tileGridSize = (8,8) means enhancement is applied tile-by-tile
+
+Applies CLAHE to the input X-ray using:
+Output = CLAHE_Processor.apply(Input)
+This produces more balanced, diagnostic-quality contrast.
+
+✔ Saving Results
 cv2.imwrite("results/equalized.png", equalized)
 cv2.imwrite("results/clahe.png", clahe_output)
-5. Visual Results
-🔸 Input Image
 
+*These commands export both processed images into the results/ folder.
+*This ensures that the enhancement is reproducible and that results are easy to compare.
+
+Equivalent conceptual command:
+SaveImage("results/equalized.png", Enhanced_Hist)
+SaveImage("results/clahe.png", Enhanced_CLAHE)
+
+✔ Confirmation Message
+print("Processing complete. Outputs saved in the 'results' folder.")
+Prints a simple message to inform the user that the processing is done.
+
+5. Visual Results
+🔸 Original Image
 data/sample_image.png
 
-🔸 Output 1 — Histogram Equalization
-
+🔸 Global Histogram Equalization
 results/equalized.png
 
-🔸 Output 2 — CLAHE
-
+🔸 CLAHE (Localized Enhancement)
 results/clahe.png
 
-Observation:
+Interpretation:
+*Histogram Equalization brightens the image globally.
+*CLAHE reveals finer structural details (lung textures, soft tissues).
+*CLAHE avoids over-enhancement and produces more clinically meaningful contrast.
 
-Histogram Equalization improves global contrast but can appear harsh.
+| Technique              | Type   | Strengths                                | Weaknesses                |
+| ---------------------- | ------ | ---------------------------------------- | ------------------------- |
+| Histogram Equalization | Global | Fast, strong contrast enhancement        | Over-enhancement risk     |
+| CLAHE                  | Local  | Enhances subtle details, preserves noise | Requires parameter tuning |
 
-CLAHE produces more balanced and clinically useful enhancement by focusing on local image regions.
- 6. Comparison
-Method	Type	Strengths	Weaknesses
-Histogram Equalization	Global	Fast, boosts overall contrast	Over-enhancement risk
-CLAHE	Local	Preserves subtle details, prevents noise	Slower, requires parameter tuning
-7. How to Run the Code
-Install required libraries:
+How to Run the Code:
+Install dependencies:
 py -3.13 -m pip install opencv-python numpy
-Run the enhancement script:
+
+Run the script:
 py -3.13 src/main.py
 
+The script will generate:
+results/equalized.png
+results/clahe.png
 
-Outputs will appear in the results/ folder.
-8. Future Work (For Final Project)
+8. Limitations (Current Version):
+*Only single-image processing
+*No quantitative metrics (PSNR, SSIM, entropy)
+*No noise filtering
+*No multi-image processing pipeline
+*Parameters are not optimized yet
+*These limitations will be addressed in the full final project.
 
-Add noise-reduction filters (Gaussian, Median)
-
-Apply sharpening (Laplacian, Unsharp Mask)
-
-Process multiple images
-
-Add quality metrics (PSNR, entropy, SSIM)
-
-Plot histograms before/after enhancement
-
-Expand the dataset
+9. Future Work:
+*Add Median and Gaussian filtering
+*Add Sharpening (Laplacian, Unsharp Masking)
+*Add histogram analysis visualization
+*Add batch processing
+*Integrate PSNR/SSIM evaluation
+*Prepare full report and experiments
