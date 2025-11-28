@@ -41,21 +41,17 @@ This project demonstrates how simple, transparent methods can significantly impr
 
 2. Repository Structure:
    
-### 📂 Repository Structure
+### 📁 Repository Structure
 
-📁 **Medical-Image-Enhancement-DIP**
-│
-├── 📂 **data**
-│     └── 📄 sample_image.png  
-│
-├── 📂 **results**
-│     ├── 📄 equalized.png  
-│     └── 📄 clahe.png  
-│
-├── 📂 **src**
-│     └── 📄 main.py  
-│
-└── 📄 **README.md**
+- **Medical-Image-Enhancement-DIP/**
+  - **data/**
+    - `sample_image.png` — Original chest X-ray
+  - **results/**
+    - `equalized.png` — Histogram Equalization output
+    - `clahe.png` — CLAHE enhancement output
+  - **src/**
+    - `main.py` — Image enhancement pipeline
+  - **README.md** — Project documentation
 
 
 This folder structure reflects open, reproducible research practices—clean separation of data, code, and results.
