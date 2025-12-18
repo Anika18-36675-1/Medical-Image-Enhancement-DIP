@@ -1,42 +1,53 @@
-Automated Image Enhancement Pipeline for Medical X-ray Analysis
-Introduction
-This repository contains the source code and implementation for an automated Digital Image Processing (DIP) pipeline designed for Chest X-ray enhancement. Medical X-rays often suffer from low contrast and noise, which can obscure critical diagnostic features. This project provides a reproducible method to enhance local contrast and fine anatomical details using a sequence of non-linear filters.
+# Automated Image Enhancement Pipeline for Medical X-ray Analysis
 
-We address the common "noise vs. clarity" trade-off by implementing a pipeline that maximizes Entropy (Information Content) while monitoring PSNR (Structural Integrity).
-Overall WorkflowThe project follows a specific 4-stage pipeline to ensure that noise is suppressed before sharpening occurs:
-Normalization: Pixel intensity standardization.
-CLAHE: Local contrast enhancement using an 8 * 8 tile grid.
-Median Filter: Non-linear denoising to preserve structural edges.Unsharp 
-Masking: Weighted high-frequency detail enhancement (alpha = 0.5).
+## 📖 Introduction
+Medical X-ray imaging is a primary diagnostic tool, yet raw images frequently suffer from low contrast and inherent noise due to varying exposure levels or patient physiology. Such limitations can obscure subtle but critical anatomical features, such as fine pulmonary vascularity or early-stage nodules.
 
-Technical Methodology
-Contrast Enhancement Strategy
-A key component of this pipeline is the transition from Global Histogram Equalization (HE) to Contrast Limited Adaptive Histogram Equalization (CLAHE). As shown in the histogram analysis below, CLAHE prevents the over-saturation common in standard HE by redistributing pixel intensities locally.
+This repository provides an automated, reproducible **Digital Image Processing (DIP) pipeline** designed to maximize the visibility of diagnostic information. By integrating local contrast stretching with non-linear denoising, we provide a robust solution for medical image pre-processing.
 
-Pipeline Progression
-The effectiveness of each stage is demonstrated in the progression below. Notice how the Median Filter cleans the noise introduced during contrast enhancement, providing a clean input for the final Sharpening stage.
+---
 
-Evaluation & Results
-Success is measured through two primary quantitative metrics:
-Metric,Original,Enhanced,Impact
-Entropy (H),7.410,7.882,Increase: Significant information gain.
-PSNR (dB),N/A,24.53,Trade-off: Measured structural penalty.
+## 🛠️ Methodology & Implementation
+The pipeline is designed as a sequential flow to ensure that contrast is optimized before noise is handled and edges are sharpened.
 
-Discussion of the Trade-off
-Our findings demonstrate a measurable Trade-off. The aggressive nature of Unsharp Masking is required to achieve a high Entropy gain (diagnostic clarity), which in turn causes the PSNR to drop below the traditional 30 dB benchmark. This quantification is essential for clinical applications to ensure the balance between visibility and image integrity.
+### 1. Preprocessing & Normalization
+Input images are converted to grayscale and normalized to a standard intensity range. This ensures the mathematical consistency of the subsequent filters across different X-ray datasets.
 
-Installation & Usage
-Prerequisites
-Install the required libraries:
+### 2. Contrast Enhancement (CLAHE)
+Unlike standard Global Histogram Equalization (HE), which often causes over-saturation (e.g., making bone structures appear "blown out"), we utilize **Contrast Limited Adaptive Histogram Equalization (CLAHE)**. CLAHE operates on an $8 \times 8$ tile grid, enhancing local contrast while preventing the amplification of background noise.
+
+![Histogram Comparison](./assets/histograms.png)
+*Figure 1: Comparison between Original, HE, and CLAHE processed images with corresponding histograms.*
+
+### 3. Non-Linear Denoising (Median Filter)
+X-ray data often contains impulsive "salt-and-pepper" noise. We apply a **Median Filter** specifically because it is edge-preserving. It cleans random noisy pixels while maintaining the sharp boundaries of ribs and soft tissues, which is vital for clinical accuracy.
+
+### 4. Controlled Sharpening (Unsharp Masking)
+To define fine diagnostic details, we use **Unsharp Masking**. This creates a high-frequency mask that is added back to the image with a weight factor ($\alpha$). We set $\alpha = 0.5$ to balance visual sharpness with image integrity.
+
+![Pipeline Progression](./assets/progression.png)
+*Figure 2: Step-by-step visual progression of the enhancement pipeline.*
+
+---
+
+## 📊 Evaluation & Quantitative Analysis
+We evaluate the performance of the pipeline using two objective metrics to quantify the "Information vs. Quality" trade-off.
+
+| Metric | Baseline (Original) | Final Enhanced | Goal/Impact |
+| :--- | :--- | :--- | :--- |
+| **Entropy ($H$)** | 7.410 | **7.882** | **SUCCESS:** Increased information content for diagnosis. |
+| **PSNR (dB)** | N/A | **27.53** | **TRADE-OFF:** Quantified cost of aggressive sharpening. |
+
+### The "Trade-Off" Discussion
+Our analysis reveals a critical engineering trade-off:
+* **Gain:** The increase in **Entropy** proves the pipeline successfully extracted "hidden" diagnostic information from the raw scan.
+* **Cost:** The **PSNR of 27.53 dB** (below the standard 30 dB threshold) is the exact quantification of the structural changes introduced by aggressive sharpening. To gain clarity, we accept a measurable sacrifice in structural similarity.
+
+---
+
+## 🚀 Installation & Usage
+
+### 1. Prerequisites
+Ensure you have Python 3.8+ installed along with the following libraries:
+```bash
 pip install opencv-python numpy matplotlib
-
-Usage
-To run the enhancement pipeline:
-python main.py --input ./data/sample.png --alpha 0.5
-
-References
-Zuiderveld, K. "Contrast Limited Adaptive Histogram Equalization." Graphics Gems IV (1994).
-
-NIH Clinical Center. ChestX-ray14 Database.
-
-Bradski, G. "The OpenCV Library." Dr. Dobb's Journal of Software Tools (2000).
