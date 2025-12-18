@@ -1,197 +1,42 @@
-# Medical Image Enhancement Using Classical Histogram-Based Techniques
+Automated Image Enhancement Pipeline for Medical X-ray Analysis
+Introduction
+This repository contains the source code and implementation for an automated Digital Image Processing (DIP) pipeline designed for Chest X-ray enhancement. Medical X-rays often suffer from low contrast and noise, which can obscure critical diagnostic features. This project provides a reproducible method to enhance local contrast and fine anatomical details using a sequence of non-linear filters.
 
-This repository contains a reproducible, open-science implementation of a medical image enhancement pipeline using classical Digital Image Processing (DIP) techniques.  
-The current version implements two commonly used contrast-enhancement methods:
+We address the common "noise vs. clarity" trade-off by implementing a pipeline that maximizes Entropy (Information Content) while monitoring PSNR (Structural Integrity).
+Overall WorkflowThe project follows a specific 4-stage pipeline to ensure that noise is suppressed before sharpening occurs:
+Normalization: Pixel intensity standardization.
+CLAHE: Local contrast enhancement using an 8 * 8 tile grid.
+Median Filter: Non-linear denoising to preserve structural edges.Unsharp 
+Masking: Weighted high-frequency detail enhancement (alpha = 0.5).
 
-- **Histogram Equalization**  
-- **CLAHE (Contrast Limited Adaptive Histogram Equalization)**
+Technical Methodology
+Contrast Enhancement Strategy
+A key component of this pipeline is the transition from Global Histogram Equalization (HE) to Contrast Limited Adaptive Histogram Equalization (CLAHE). As shown in the histogram analysis below, CLAHE prevents the over-saturation common in standard HE by redistributing pixel intensities locally.
 
-Although simple, these methods are widely used as preprocessing steps in medical imaging pipelines because they improve visibility of important anatomical details.
+Pipeline Progression
+The effectiveness of each stage is demonstrated in the progression below. Notice how the Median Filter cleans the noise introduced during contrast enhancement, providing a clean input for the final Sharpening stage.
 
-This documentation follows the structure and style of the example GitHub project shared by the instructor, providing a clear, transparent explanation of every step and command used.
+Evaluation & Results
+Success is measured through two primary quantitative metrics:
+Metric,Original,Enhanced,Impact
+Entropy (H),7.410,7.882,Increase: Significant information gain.
+PSNR (dB),N/A,24.53,Trade-off: Measured structural penalty.
 
----
+Discussion of the Trade-off
+Our findings demonstrate a measurable Trade-off. The aggressive nature of Unsharp Masking is required to achieve a high Entropy gain (diagnostic clarity), which in turn causes the PSNR to drop below the traditional 30 dB benchmark. This quantification is essential for clinical applications to ensure the balance between visibility and image integrity.
 
-1. Project Motivation
+Installation & Usage
+Prerequisites
+Install the required libraries:
+pip install opencv-python numpy matplotlib
 
-Medical images such as X-rays often suffer from:
+Usage
+To run the enhancement pipeline:
+python main.py --input ./data/sample.png --alpha 0.5
 
-- Poor global contrast  
-- Uneven illumination  
-- Low visibility of subtle anatomical structures  
-- Difficulties in distinguishing tissues, ribs, and abnormalities  
+References
+Zuiderveld, K. "Contrast Limited Adaptive Histogram Equalization." Graphics Gems IV (1994).
 
-Enhancement techniques can improve interpretation by radiologists and can serve as preprocessing for downstream tasks such as:
+NIH Clinical Center. ChestX-ray14 Database.
 
-- Segmentation  
-- Classification  
-- Image registration  
-- Feature extraction  
-
-While modern deep learning methods exist, **classical enhancement is still important** due to:
-
-- Low computational requirements  
-- Full interpretability  
-- Robustness  
-- Ability to improve visibility before applying advanced algorithms  
-
-This project demonstrates how simple, transparent methods can significantly improve X-ray images.
-
----
-
-2. Repository Structure:
-   
-### Repository Structure
-
-- **Medical-Image-Enhancement-DIP/**
-  - **data/**
-    - `sample_image.png` — Original chest X-ray
-  - **results/**
-    - `equalized.png` — Histogram Equalization output
-    - `clahe.png` — CLAHE enhancement output
-  - **src/**
-    - `main.py` — Image enhancement pipeline
-  - **README.md** — Project documentation
-
-
-This folder structure reflects open, reproducible research practices—clean separation of data, code, and results.
-
----
-
-3. Enhancement Methods
-
-## 3.1 Histogram Equalization (Global Enhancement)
-
-Histogram Equalization adjusts pixel intensities so that they spread across the entire available range.  
-This produces:
-
-- Stronger global contrast  
-- Better visibility of bones and lung boundaries  
-- Brighter overall appearance  
-
-**Limitation:**  
-It may over-enhance bright regions and does not account for local differences in illumination.
-
----
-
-3.2 CLAHE (Local Adaptive Enhancement)
-
-CLAHE divides the image into tiles (e.g., 8×8), applies histogram equalization to each tile, and then blends them smoothly.  
-It also limits contrast amplification to prevent noise from exploding.
-
-**Benefits for medical images:**
-
-- Enhances local soft-tissue contrast  
-- Preserves subtle structural details  
-- Avoids harsh brightness jumps  
-- Handles uneven illumination well  
-
-This makes CLAHE more clinically suitable for X-rays than global histogram equalization.
-
----
-
-4. Code Explanation (Line-by-Line Breakdown)
-
-Below is the **full explanation of each command used in `main.py`**, written in the style of your professor’s example repo.
-
-✔ Importing Required Libraries
-python
-import cv2
-import numpy as np
-
-cv2 is OpenCV, the core image-processing library.
-numpy handles arrays and pixel-level operations.
-
-Loading the Input Image:
-image = cv2.imread("data/sample_image.png", 0)
-
-*Loads the X-ray from the data/ folder.
-*The 0 flag ensures grayscale mode (correct for X-ray analysis).
-*The image is loaded as a NumPy array.
-
-Why grayscale?
-Medical X-rays are single-channel intensity images.
-Histogram-based enhancement works directly on grayscale matrices.
-
-✔ Applying Global Histogram Equalization
-equalized = cv2.equalizeHist(image)
-
-*This performs a global redistribution of pixel intensities.
-*Improves visibility of high-density structures
-*Makes the entire image brighter
-*Enhances overall contrast
-
-Equivalent conceptual command:
-Enhanced_Image = HistogramEqualize(Input_Image)
-
-✔ Applying CLAHE (Local Adaptive Enhancement)
-clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-clahe_output = clahe.apply(image)
-This command:
-*Creates a CLAHE processor with chosen parameters:
-*clipLimit = 2.0 prevents noise from over-amplifying
-*tileGridSize = (8,8) means enhancement is applied tile-by-tile
-
-Applies CLAHE to the input X-ray using:
-Output = CLAHE_Processor.apply(Input)
-This produces more balanced, diagnostic-quality contrast.
-
-✔ Saving Results
-cv2.imwrite("results/equalized.png", equalized)
-cv2.imwrite("results/clahe.png", clahe_output)
-
-*These commands export both processed images into the results/ folder.
-*This ensures that the enhancement is reproducible and that results are easy to compare.
-
-Equivalent conceptual command:
-SaveImage("results/equalized.png", Enhanced_Hist)
-SaveImage("results/clahe.png", Enhanced_CLAHE)
-
-✔ Confirmation Message
-print("Processing complete. Outputs saved in the 'results' folder.")
-Prints a simple message to inform the user that the processing is done.
-
-5. Visual Results
-🔸 Original Image
-data/sample_image.png
-
-🔸 Global Histogram Equalization
-results/equalized.png
-
-🔸 CLAHE (Localized Enhancement)
-results/clahe.png
-
-Interpretation:
-*Histogram Equalization brightens the image globally.
-*CLAHE reveals finer structural details (lung textures, soft tissues).
-*CLAHE avoids over-enhancement and produces more clinically meaningful contrast.
-
-| Technique              | Type   | Strengths                                | Weaknesses                |
-| ---------------------- | ------ | ---------------------------------------- | ------------------------- |
-| Histogram Equalization | Global | Fast, strong contrast enhancement        | Over-enhancement risk     |
-| CLAHE                  | Local  | Enhances subtle details, preserves noise | Requires parameter tuning |
-
-How to Run the Code:
-Install dependencies:
-py -3.13 -m pip install opencv-python numpy
-
-Run the script:
-py -3.13 src/main.py
-
-The script will generate:
-results/equalized.png
-results/clahe.png
-
-9.limitations:
-  - Only supports single-image processing
-  - No quantitative evaluation metrics (PSNR, SSIM, entropy)
-  - No noise filtering implemented
-  - No batch/multi-image processing
-  - Enhancement parameters not optimized
-
-10.future_work:
-  - Add noise reduction filters (Median, Gaussian)
-  - Add sharpening (Laplacian, Unsharp Mask)
-  - Add histogram visualization (before/after)
-  - Add batch image processing support
-  - Integrate quality metrics (PSNR, SSIM)
+Bradski, G. "The OpenCV Library." Dr. Dobb's Journal of Software Tools (2000).
